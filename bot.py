@@ -10,6 +10,9 @@ from telegram.ext import (
 
 logging.basicConfig(level=logging.INFO)
 TOKEN = os.environ.get("BOT_TOKEN")
+if not TOKEN:
+    raise ValueError("BOT_TOKEN bulunamadi!")
+
 DATA_FILE = "kiraci_data.json"
 AD, SOYAD, DAIRE, KIRA, TARIH = range(5)
 
