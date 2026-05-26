@@ -94,7 +94,7 @@ async def tarih_al(update: Update, context: ContextTypes.DEFAULT_TYPE):
        veri_kaydet(data)
        keyboard = [[InlineKeyboardButton("Ana Menu", callback_data="ana_menu")]]
        await update.message.reply_text(
-           f"Kiraci eklendi!\nAd: {kiraci['ad']} {kiraci['soyad']}\nDaire: {kiraci['daire']}\nKira: {kiraci['kira']:,.0f} TL\nOdeme gunu: {gun}",
+           "Kiraci eklendi!\nAd: " + kiraci["ad"] + " " + kiraci["soyad"] + "\nDaire: " + kiraci["daire"] + "\nKira: " + str(int(kiraci["kira"])) + " TL\nOdeme gunu: " + str(gun),
            reply_markup=InlineKeyboardMarkup(keyboard)
        )
        return ConversationHandler.END
@@ -121,7 +121,7 @@ async def listele(update: Update, context: ContextTypes.DEFAULT_TYPE):
    for k in kiracılar:
        odendi = ay_key in k.get("odendi_aylar", [])
        durum = "Odendi" if odendi else "Odenmedi"
-       mesaj += f"{k['ad']} {k['soyad']} - Daire {k['daire']}\n{k['kira']:,.0f} TL | {k['odeme_gunu']}. gun | {durum}\n\n"
+       mesaj = mesaj + k["ad"] + " " + k["soyad"] + " - Daire " + k["daire"] + "\n" + str(int(k["kira"])) + " TL | " + str(k["odeme_gunu"]) + ". gun | " + durum + "\n\n"
    keyboard = [[InlineKeyboardButton("Ana Menu", callback_data="ana_menu")]]
    await query.edit_message_text(mesaj, reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -138,8 +138,11 @@ async def odeme_listesi(update: Update, context: ContextTypes.DEFAULT_TYPE):
    keyboard = []
    for k in kiracılar:
        odendi = ay_key in k.get("odendi_aylar", [])
-       etiket = f"{'[OK]' if odendi else '[BEKLIYOR]'} {k['ad']} {k['soyad']} - Daire {k['daire']}"
-       keyboard.append([InlineKeyboardButton(etiket, callback_data=f"toggle_{k['id']}")])
+       if odendi:
+           etiket = "[OK] " + k["ad"] + " " + k["soyad"] + " - Daire " + k["daire"]
+       else:
+           etiket = "[BEKLIYOR] " + k["ad"] + " " + k["soyad"] + " - Daire " + k["daire"]
+       keyboard.append([InlineKeyboardButton(etiket, callback_data="toggle_" + k["id"])])
    keyboard.append([InlineKeyboardButton("Ana Menu", callback_data="ana_menu")])
    await query.edit_message_text("Odeme Durumu - Tiklayarak degistirin:", reply_markup=InlineKeyboardMarkup(keyboard))
 
@@ -154,14 +157,19 @@ async def odeme_toggle(update: Update, context: ContextTypes.DEFAULT_TYPE):
        if k["id"] == kiraci_id:
            if ay_key in k.get("odendi_aylar", []):
                k["odendi_aylar"].remove(ay_key)
-               mesaj = f"{k['ad']} {k['soyad']} - geri alindi"
+               mesaj = k["ad"] + " " + k["soyad"] + " - geri alindi"
            else:
                k.setdefault("odendi_aylar", []).append(ay_key)
-               mesaj = f"{k['ad']} {k['soyad']} - odendi isaretlendi"
+               mesaj = k["ad"] + " " + k["soyad"] + " - odendi isaretlendi"
            break
    veri_kaydet(data)
    keyboard = []
    for k in data["kiracılar"]:
        odendi = ay_key in k.get("odendi_aylar", [])
-       etiket = f"{'[OK]' if odendi else '[BEKLIYOR]'} {k['ad']} {k['soyad']} - Daire {k['daire']}"
-       keyboard.append([InlineKeyboardButton(etiket, callback_data=f"toggle
+       if odendi:
+           etiket = "[OK] " + k["ad"] + " " + k["soyad"] + " - Daire " + k["daire"]
+       else:
+           etiket = "[BEKLIYOR] " + k["ad"] + " " + k["soyad"] + " - Daire " + k["daire"]
+       keyboard.append([InlineKeyboardButton(etiket, callback_data="toggle_" + k["id"])])
+   keyboard.append([InlineKeyboardButton("Ana Menu", callback_data="ana_menu")])
+   await query.edit_message_text("Odeme Durumu\n" + mesaj + "\n\nTiklayarak degistirin:", reply_markup=InlineKeyboardMarkup(keyboard))
