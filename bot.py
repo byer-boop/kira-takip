@@ -138,7 +138,8 @@ async def depozito_al(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return ConversationHandler.END
     except ValueError:
-        await update.message.reply_text("Gecerli bir sayi yazin (yoksa 0)
+                await update.message.reply_text("Gecerli bir sayi yazin (yoksa 0):")
+
 async def listele(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
