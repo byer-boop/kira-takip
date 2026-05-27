@@ -1,3 +1,6 @@
+import sys
+print("Python version:", sys.version)
+print("Starting bot...")
 import os
 import json
 import logging
